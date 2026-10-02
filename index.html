@@ -1144,6 +1144,15 @@ body{background:white;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 
 </style>
 
+<style>
+/* Récapitulatif automatique des cubes nécessaires */
+.cube-summary{margin-top:12px;padding:9px 12px;border-radius:9px;background:#f5f7f9;font-size:9px;color:#4b5563;text-align:center;}
+.cube-summary strong{color:#25364A;}
+.cube-summary .cube-item{display:inline-flex;align-items:center;gap:4px;margin:3px 5px;}
+.cube-summary .dot{width:9px;height:9px;border-radius:2px;border:1px solid #ccd3da;display:inline-block;}
+@media print{.cube-summary{font-size:9pt;margin-top:3mm;padding:2.5mm 3mm;}.cube-summary .cube-item{margin:1mm 2mm;}}
+</style>
+
 <!-- V30 : palette très vive optimisée pour impression -->
 <!-- V31 : rouge plus vif et marron plus brun -->
 <!-- V32 : bleu plus foncé et violet plus clair -->
@@ -1193,6 +1202,7 @@ body{background:white;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   <div class="model-grid-real grid" id="grid"></div>
 </div>
 <div class="legend" id="legend"></div>
+<div class="cube-summary" id="cubeSummary"></div>
 </div>
 <div class="objective"><b>OBJECTIF</b><span id="sheetObjective">Reproduire un motif en respectant le repérage dans la grille 5 × 5.</span></div>
 <div class="footer"><span>PIX-SENSO 5×5</span><span>Senso3D • Fiche d'activité</span></div>
@@ -1251,6 +1261,10 @@ function render(){
 
  const used=colors.filter(([n])=>cnt[n]).map(([n,c])=>`<span><i class="dot" style="background:${c}"></i>${n}</span>`).join("");
  document.getElementById("legend").innerHTML=used;
+
+ const summaryItems=colors.filter(([n])=>cnt[n]).map(([n,c])=>`<span class="cube-item"><i class="dot" style="background:${c}"></i><span>${n} × <strong>${cnt[n]}</strong></span></span>`).join("");
+ const cubeSummary=document.getElementById("cubeSummary");
+ cubeSummary.innerHTML=summaryItems ? `<strong>Cubes nécessaires :</strong> ${summaryItems}` : "";
 }
 document.getElementById("title").oninput=render;
 document.getElementById("objectiveInput").oninput=render;
