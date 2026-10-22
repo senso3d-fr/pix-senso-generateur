@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Générateur Pix-Senso 5×5</title>
+<title>Générateur Pix-Senso 5×5 — v87</title>
 <style>
 :root{--navy:#25364A;--blue:#4E8CCB;--teal:#39A89A;--bg:#eef2f5;--card:#fff;--muted:#687585}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:#1f2937}
@@ -1235,6 +1235,33 @@ body{background:white;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #objectKeySheet .object-key-symbol img.gcode-picto { width:10mm!important; height:10mm!important; max-width:10mm!important; max-height:10mm!important; object-fit:contain!important; }
 }
 </style>
+
+<style id="pix-senso-solution-page-v87">
+.solution-sheet{display:none}
+.solution-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:8mm;align-items:start;margin-top:8mm}
+.solution-model{border:1px solid #d8e0e7;border-radius:3mm;padding:5mm;min-width:0}
+.solution-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.5mm;width:100%;max-width:92mm;margin:0 auto}
+.solution-cell{aspect-ratio:1;border:1px solid #d5dce3;border-radius:1mm;min-width:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.solution-cell.is-hidden-cell{visibility:hidden}
+.solution-counts{border:1px solid #d8e0e7;border-radius:3mm;padding:5mm}
+.solution-counts h4{margin:0 0 4mm;font-size:13pt;color:#25364A}
+.solution-count-row{display:flex;align-items:center;gap:3mm;margin:0 0 3mm;font-size:11pt;break-inside:avoid}
+.solution-swatch{width:7mm;height:7mm;border:1px solid #ccd3da;border-radius:1mm;flex:0 0 auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.solution-count-row strong{margin-left:auto;font-size:12pt}
+.solution-total{border-top:1px solid #d8e0e7;padding-top:4mm;margin-top:4mm;font-weight:bold;font-size:13pt;display:flex;justify-content:space-between;gap:4mm}
+@media print{
+ body.gcode-theme #solutionSheet{display:block!important;visibility:visible!important;position:relative!important;break-before:page!important;page-break-before:always!important;width:210mm!important;height:297mm!important;margin:0!important;padding:16mm!important;box-sizing:border-box!important;overflow:hidden!important;background:#fff!important;color:#111!important;box-shadow:none!important;border-radius:0!important}
+ body.gcode-theme #solutionSheet .sheetHead{height:24mm}
+ body.gcode-theme #solutionSheet .sheetHead strong{font-size:20pt}
+ body.gcode-theme #solutionSheet .sheetTitle h3{font-size:21pt}
+ body.gcode-theme #solutionSheet .solution-layout{grid-template-columns:1.15fr .85fr;gap:7mm;margin-top:7mm}
+ body.gcode-theme #solutionSheet .solution-grid{grid-template-columns:repeat(5,1fr);gap:1.5mm;width:100%;max-width:92mm}
+ body.gcode-theme #solutionSheet .solution-cell{border-radius:1mm}
+ body.gcode-theme #solutionSheet .solution-count-row{font-size:11pt;margin-bottom:3mm}
+ body.gcode-theme #solutionSheet .solution-swatch{width:7mm;height:7mm}
+}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -1338,6 +1365,16 @@ body{background:white;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   <div class="objective"><b>COMMENT UTILISER LA LÉGENDE ?</b><span>Repère l’élément dans la grille, puis retrouve la couleur correspondante dans cette légende.</span></div>
   <div class="footer"><span>PIX-SENSO</span><span>Senso3D • Clé G-Code</span></div>
 </div>
+<div class="solution-sheet" id="solutionSheet" aria-label="Solution et quantité de cubes">
+  <div class="sheetHead"><div><strong>PIX-SENSO</strong><small>Fiche de contrôle • Solution</small></div><img class="sheetLogo" id="solutionLogo" alt="Senso3D"></div>
+  <div class="sheetTitle"><h3 id="solutionTitle">Solution du modèle</h3><p>Compare le résultat imprimé avec cette solution et vérifie les quantités de cubes.</p></div>
+  <div class="solution-layout">
+    <div class="solution-model"><div class="modelLabel">SOLUTION ATTENDUE</div><div class="solution-grid" id="solutionGrid"></div></div>
+    <div class="solution-counts"><h4>Cubes nécessaires</h4><div id="solutionCounts"></div><div class="solution-total" id="solutionTotal"></div></div>
+  </div>
+  <div class="objective"><b>CONTRÔLE APRÈS IMPRESSION</b><span>Vérifie que les cubes imprimés correspondent aux couleurs et aux quantités indiquées.</span></div>
+  <div class="footer"><span>PIX-SENSO 5×5</span><span>Senso3D • Fiche de contrôle G-Code</span></div>
+</div>
 </div>
 </div>
 </div>
@@ -1418,38 +1455,63 @@ function render(){
 document.getElementById("title").oninput=render;
 document.getElementById("objectiveInput").oninput=render;
 document.getElementById("level").onchange=render;
+function prepareSolutionPage(){
+  const sheet=document.getElementById('solutionSheet');
+  if(!sheet)return;
+  document.getElementById('solutionLogo').src=logoData;
+  document.getElementById('solutionTitle').textContent=(document.getElementById('title').value||'Mon dessin')+' — solution';
+  const solutionGrid=document.getElementById('solutionGrid');
+  const active=new Set(activeIndices());
+  solutionGrid.innerHTML='';
+  for(let i=0;i<25;i++){
+    const cell=document.createElement('div');
+    cell.className='solution-cell'+(active.has(i)?'':' is-hidden-cell');
+    const name=cells[i];
+    const color=colors.find(x=>x[0]===name);
+    cell.style.backgroundColor=(name!=='vide'&&color)?color[1]:'#E5E7EB';
+    if(name==='vide')cell.style.backgroundImage='linear-gradient(135deg,#f3f4f6 25%,#e5e7eb 25%,#e5e7eb 50%,#f3f4f6 50%,#f3f4f6 75%,#e5e7eb 75%,#e5e7eb 100%)';
+    solutionGrid.appendChild(cell);
+  }
+  const cnt=count();
+  const used=colors.filter(([name])=>(cnt[name]||0)>0);
+  document.getElementById('solutionCounts').innerHTML=used.map(([name,hex])=>`<div class="solution-count-row"><span class="solution-swatch" style="background:${hex}"></span><span>${name[0].toUpperCase()+name.slice(1)}</span><strong>${cnt[name]}</strong></div>`).join('')||'<p>Aucun cube dans ce modèle.</p>';
+  const total=activeIndices().filter(i=>cells[i]!=='vide').length;
+  document.getElementById('solutionTotal').innerHTML=`<span>Total</span><strong>${total} cube${total>1?'s':''}</strong>`;
+}
 function printSheet(){
   try {
     const mode = document.getElementById("printColorKeyMode")?.value || "square";
     document.body.classList.toggle("legend-name-only", mode === "name");
     document.body.classList.toggle("legend-square-only", mode === "square");
-
-    if (typeof window.__pixSensoPreparePrintKey === "function") {
-      window.__pixSensoPreparePrintKey();
-    }
-
+    if (typeof window.__pixSensoPreparePrintKey === "function") window.__pixSensoPreparePrintKey();
     const chosen = [...document.querySelectorAll(".gcode-choice:checked")].map(el => el.value);
+    const hasGcode = chosen.length > 0;
     const shapePage = document.getElementById("shapeKeySheet");
     const objectPage = document.getElementById("objectKeySheet");
-
-    // La clé dynamique actuelle est générée dans objectKeyGrid pour tous les G-Codes,
-    // y compris Forme. Ne jamais imprimer l'ancienne clé statique shapeKeySheet.
     document.body.classList.remove("gcode-forme");
-    document.body.classList.toggle("gcode-theme", chosen.length > 0);
+    document.body.classList.toggle("gcode-theme", hasGcode);
     if (shapePage) {
       shapePage.style.setProperty("display", "none", "important");
       shapePage.style.setProperty("visibility", "hidden", "important");
     }
     if (objectPage) {
-      const showKey = chosen.length > 0;
-      objectPage.style.setProperty("display", showKey ? "block" : "none", "important");
-      objectPage.style.setProperty("visibility", showKey ? "visible" : "hidden", "important");
-      objectPage.style.setProperty("break-before", showKey ? "page" : "auto", "important");
-      objectPage.style.setProperty("page-break-before", showKey ? "always" : "auto", "important");
+      objectPage.style.setProperty("display", hasGcode ? "block" : "none", "important");
+      objectPage.style.setProperty("visibility", hasGcode ? "visible" : "hidden", "important");
+      objectPage.style.setProperty("break-before", hasGcode ? "page" : "auto", "important");
+      objectPage.style.setProperty("page-break-before", hasGcode ? "always" : "auto", "important");
     }
-  } catch (err) {
-    console.error("Préparation de l'impression :", err);
-  }
+    const solutionPage=document.getElementById('solutionSheet');
+    if(solutionPage){
+      prepareSolutionPage();
+      solutionPage.style.setProperty('display',hasGcode?'block':'none','important');
+      solutionPage.style.setProperty('visibility',hasGcode?'visible':'hidden','important');
+      solutionPage.style.setProperty('break-before',hasGcode?'page':'auto','important');
+      solutionPage.style.setProperty('page-break-before',hasGcode?'always':'auto','important');
+    }
+    // Le mode classique garde les quantités sous la légende en page 2.
+    const summary=document.getElementById('cubeSummary');
+    if(summary) summary.style.setProperty('display',hasGcode?'none':'block','important');
+  } catch (err) { console.error("Préparation de l'impression :", err); }
   window.print();
 }
 
