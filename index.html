@@ -1293,6 +1293,43 @@ body{background:white;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
 
+<style id="pix-senso-mobile-tabs">
+@media screen and (max-width:800px){
+ body{background:#eef2f6}
+ .app{width:100%;max-width:none;margin:0;padding:0 12px 24px}
+ .top{margin:0 -12px 12px;padding:17px 16px;background:var(--navy);color:white;border:0;border-radius:0 0 18px 18px;gap:10px;align-items:center}
+ .top h1{font-size:20px;line-height:1.2;color:white}.top p{font-size:12px;line-height:1.4;color:white}
+ .logo{width:64px;height:50px;flex:0 0 64px}
+ .layout{display:flex;flex-direction:column;gap:12px;margin-top:0}
+ .layout>.preview{order:0;width:100%;min-width:0}
+ .layout>.controls{order:1;width:100%;min-width:0;padding:0;background:transparent;box-shadow:none}
+ .preview{align-items:stretch}
+ .preview .sheet{width:100%;max-width:650px;margin:auto;padding:14px;border-radius:16px;box-shadow:0 2px 12px #25364A12}
+ .sheetHead{height:auto;min-height:58px;padding:10px 12px}.sheetHead strong{font-size:16px}.sheetLogo{width:54px;height:36px}
+ .sheetTitle{margin:14px 0 10px}.sheetTitle h3{font-size:18px}.sheetTitle p{font-size:12px;line-height:1.4}
+ .model{padding:10px;border-radius:12px}.modelLabel{font-size:10px;margin-bottom:10px}
+ .grid{width:100%;gap:3px}.cell{border-radius:4px}
+ .legend{font-size:10px;gap:7px}.objective{font-size:12px;line-height:1.4;padding:11px}
+ .mobile-sections{display:flex;flex-direction:column;gap:9px}
+ .mobile-section{background:#fff;border:1px solid #dce4ec;border-radius:15px;overflow:hidden;box-shadow:0 2px 8px #25364A0a}
+ .mobile-section summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:58px;padding:15px 16px;font-size:15px;font-weight:700;color:var(--navy);cursor:pointer;touch-action:manipulation}
+ .mobile-section summary::-webkit-details-marker{display:none}
+ .mobile-section summary:after{content:'+';display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex:0 0 28px;border-radius:50%;background:#edf4fb;color:var(--blue);font-size:23px;font-weight:400}
+ .mobile-section[open] summary:after{content:'−'}
+ .mobile-section-body{padding:0 15px 16px;border-top:1px solid #edf0f4}
+ .mobile-section-body h2{display:none}
+ .mobile-section-body label{font-size:13px;margin:14px 0 7px}
+ .mobile-section-body input,.mobile-section-body select{width:100%;min-height:48px;padding:12px;border:1px solid #d6dde5;border-radius:11px;font-size:16px;background:white}
+ .palette{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+ .color{min-height:64px;padding:7px 2px;border-radius:10px;font-size:10px}
+ .swatch{width:25px;height:25px}
+ .tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .tools .btn{min-height:46px;padding:10px 7px;font-size:13px;border-radius:11px}
+ .tools #randomBtn{grid-column:1/-1}
+ .random-options{padding:12px!important;border-radius:12px!important}
+ .notice{font-size:12px;line-height:1.4}
+}
+</style>
 </head>
 <body>
 <div class="app">
@@ -2017,6 +2054,32 @@ body.gcode-theme .object-key-symbol{width:10mm;height:10mm;font-size:22pt}
   .sheetHead small { opacity: 1 !important; }
 }
 </style>
+<script id="pix-senso-mobile-sections">
+(function(){
+ function buildMobileSections(){
+  if(window.innerWidth>800)return;
+  var controls=document.querySelector('.layout > .controls');
+  if(!controls||controls.dataset.mobileSectionsBuilt==='yes')return;
+  var children=Array.from(controls.children), groups=[], current=null;
+  children.forEach(function(el){
+   if(el.tagName==='H2'){current={title:el.textContent.trim(),nodes:[]};groups.push(current);}
+   else if(current){current.nodes.push(el);}
+  });
+  if(!groups.length)return;
+  var wrapper=document.createElement('div');wrapper.className='mobile-sections';
+  groups.forEach(function(group,index){
+   var details=document.createElement('details');details.className='mobile-section';details.open=index===0;
+   var summary=document.createElement('summary');summary.textContent=group.title;
+   var body=document.createElement('div');body.className='mobile-section-body';
+   group.nodes.forEach(function(node){body.appendChild(node);});
+   details.append(summary,body);wrapper.appendChild(details);
+  });
+  controls.replaceChildren(wrapper);controls.dataset.mobileSectionsBuilt='yes';
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',buildMobileSections);else buildMobileSections();
+ window.addEventListener('load',buildMobileSections);
+})();
+</script>
 </body>
 </html>
 <style id="pix-senso-v71-current-key-only">
