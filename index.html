@@ -1293,6 +1293,65 @@ body{background:white;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
 
+
+<style id="pix-senso-mobile-parity">
+/* Interface mobile harmonisée avec l'application Android Pix-Senso */
+@media screen and (max-width:800px) {
+  body { background:#f1f4f7; }
+  .app { width:100%; max-width:none; margin:0; padding:0 12px 24px; }
+  .top {
+    margin:0 -12px 14px; padding:18px 18px 20px;
+    min-height:116px; background:var(--navy); color:#fff;
+    border:0; border-radius:0 0 22px 22px;
+    align-items:flex-start; gap:12px;
+  }
+  .top h1 { color:#fff; font-size:21px; line-height:1.2; }
+  .top p { color:#fff; font-size:13px; line-height:1.45; max-width:290px; }
+  .logo { flex:0 0 72px; width:72px; height:58px; margin-top:2px; }
+  .layout { display:flex; flex-direction:column; gap:14px; margin-top:0; }
+  .layout > .preview { order:0; width:100%; min-width:0; }
+  .layout > .controls { order:1; width:100%; min-width:0; }
+  .card { padding:18px; border-radius:18px; box-shadow:0 2px 12px #25364A0d; }
+  .controls h2 {
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:17px; line-height:1.35; margin:0 0 15px; color:var(--navy);
+  }
+  .controls label { font-size:14px; margin:15px 0 8px; }
+  .controls input, .controls select {
+    min-height:52px; padding:13px 14px; border-radius:14px;
+    font-size:16px; color:#17212b; background:#fff;
+  }
+  .palette { grid-template-columns:repeat(5,minmax(0,1fr)); gap:7px; }
+  .color { min-height:70px; border-radius:12px; font-size:11px; padding:8px 2px; }
+  .swatch { width:27px; height:27px; }
+  .tools { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .tools .btn { min-height:46px; padding:11px 8px; font-size:14px; }
+  .tools #randomBtn { grid-column:1/-1; }
+  .random-options { border-radius:14px !important; padding:14px !important; }
+  .preview { align-items:stretch; }
+  .preview .sheet {
+    width:100%; max-width:650px; margin:0 auto; padding:18px;
+    border-radius:18px; box-shadow:0 2px 12px #25364A12;
+  }
+  .sheetHead { min-height:64px; height:auto; padding:12px 14px; }
+  .sheetHead strong { font-size:17px; }
+  .sheetLogo { width:62px; height:40px; }
+  .sheetTitle { margin:18px 0 12px; }
+  .sheetTitle h3 { font-size:20px; }
+  .sheetTitle p { font-size:13px; line-height:1.4; }
+  .model { padding:12px; border-radius:14px; }
+  .modelLabel { font-size:11px; padding-bottom:8px; margin-bottom:12px; }
+  .grid { width:100%; gap:4px; }
+  .cell { border-radius:6px; }
+  .legend { font-size:11px; gap:8px; }
+  .dot { width:12px; height:12px; }
+  .objective { margin-top:14px; padding:14px; font-size:13px; line-height:1.45; border-radius:14px; }
+  .objective b { margin-bottom:7px; }
+  .footer { font-size:10px; }
+  .notice { font-size:13px; line-height:1.45; }
+}
+</style>
+
 </head>
 <body>
 <div class="app">
